@@ -11,7 +11,7 @@ export default function Navigation() {
     <>
       {/* Login Button (Top Right) */}
       <div className="fixed top-4 right-4 z-50">
-        <Link href="/auth" className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-full shadow transition-all duration-200 flex items-center justify-center">
+        <Link href="/auth" className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-md shadow transition-all duration-200 flex items-center justify-center">
           Login
         </Link>
       </div>

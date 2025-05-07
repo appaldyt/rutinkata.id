@@ -76,9 +76,6 @@ export default function Home() {
       </div>
       
       <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="font-semibold">Untuk Anda</h2>
-        </div>
         
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-start space-x-3">
@@ -103,7 +100,7 @@ export default function Home() {
                 ></textarea>
                 <div className="mt-2 flex justify-end">
                   <button 
-                    className="px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!postText.trim()}
                     onClick={handlePost}
                   >
