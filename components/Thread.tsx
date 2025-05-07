@@ -18,13 +18,14 @@ type ThreadProps = {
   replies: number;
   hasLiked: boolean;
   media?: string[];
+  darkMode?: boolean;
 };
 
-export default function Thread({ id, author, content, createdAt, likes, replies, hasLiked, media }: ThreadProps) {
+export default function Thread({ id, author, content, createdAt, likes, replies, hasLiked, media, darkMode = false }: ThreadProps) {
   const timeAgo = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
   
   return (
-    <div className="border-b border-gray-200 py-4">
+    <div className={`border-b ${darkMode ? 'border-gray-700 bg-gray-900 text-white' : 'border-gray-200 bg-white text-black'} py-4 px-4`}>
       <div className="flex space-x-3">
         <Link href={`/profile/${author.username}`}>
           <div className="flex-shrink-0 w-10 h-10 relative">
@@ -39,14 +40,14 @@ export default function Thread({ id, author, content, createdAt, likes, replies,
         <div className="flex-1 min-w-0">
           <div className="flex items-center text-sm">
             <Link href={`/profile/${author.username}`}>
-              <span className="font-medium text-gray-900 hover:underline">{author.name}</span>
+              <span className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'} hover:underline`}>{author.name}</span>
             </Link>
             <span className="ml-1 text-gray-500">@{author.username}</span>
             <span className="mx-1 text-gray-500">·</span>
             <span className="text-gray-500">{timeAgo}</span>
           </div>
           
-          <div className="mt-1 text-sm text-gray-800">
+          <div className={`mt-1 text-sm ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
             {content}
           </div>
           

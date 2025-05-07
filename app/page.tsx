@@ -71,7 +71,7 @@ export default function Home() {
   
   return (
     <MainLayout>
-      <div className="mb-6">
+      <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold">Home</h1>
       </div>
       
