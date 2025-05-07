@@ -1,12 +1,15 @@
 "use client";
 
 import MainLayout from "../components/MainLayout";
-import Thread from "../components/Thread";
+import Thread, { threadFeedToProps } from "../components/Thread";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useThreads, useAuth, useCreateThread } from "../lib/hooks";
+import { supabase } from "../lib/supabase";
 
-// Mock data for threads (in a real app, this would come from Supabase)
-const mockThreads = [
+// This mock data is no longer needed as we're using real data from Supabase
+// Keeping here temporarily as reference for UI development
+/*const mockThreads = [
   {
     id: '1',
     author: {
@@ -52,21 +55,49 @@ const mockThreads = [
     replies: 12,
     hasLiked: false,
   },
-];
+];*/
 
 export default function Home() {
   const [postText, setPostText] = useState("");
+  const { threads, loading: threadsLoading, error: threadsError, refetch, handleLike } = useThreads();
+  const { user, loading: authLoading } = useAuth();
+  const { createThread, loading: postLoading } = useCreateThread();
   
-  // Current user (would come from auth in a real app)
-  const currentUser = {
-    name: "aldyt_hya",
-    avatarUrl: "https://i.pravatar.cc/150?img=3"
-  };
+  // Get current user profile
+  const [currentUser, setCurrentUser] = useState<{ username: string, avatar_url: string | null } | null>(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      if (user?.data?.user?.id) {
+        const { data } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', user.data.user.id)
+          .single();
+        
+        if (data) {
+          setCurrentUser(data);
+        }
+      }
+    };
+    
+    if (!authLoading) {
+      getCurrentUser();
+    }
+  }, [user, authLoading]);
   
-  const handlePost = () => {
-    // In a real app, this would send the post to the backend
-    console.log("Posting:", postText);
-    setPostText("");
+  const handlePost = async () => {
+    if (!postText.trim()) return;
+    
+    try {
+      const newThread = await createThread(postText);
+      if (newThread) {
+        setPostText("");
+        refetch(); // Refresh the threads list
+      }
+    } catch (error) {
+      console.error("Error posting thread:", error);
+    }
   };
   
   return (
@@ -81,15 +112,15 @@ export default function Home() {
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
               <Image 
-                src={currentUser.avatarUrl} 
-                alt={currentUser.name}
+                src={currentUser?.avatar_url || "/default-avatar.png"} 
+                alt={currentUser?.username || "User"}
                 width={40}
                 height={40}
                 className="rounded-full"
               />
             </div>
             <div className="flex-1">
-              <div className="font-medium mb-1">{currentUser.name}</div>
+              <div className="font-medium mb-1">{currentUser?.username || "User"}</div>
               <div className="relative">
                 <textarea 
                   className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
@@ -101,10 +132,10 @@ export default function Home() {
                 <div className="mt-2 flex justify-end">
                   <button 
                     className="px-4 py-2 bg-blue-500 text-white rounded-md font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!postText.trim()}
+                    disabled={!postText.trim() || postLoading || !user?.data?.user}
                     onClick={handlePost}
                   >
-                    Posting
+                    {postLoading ? "Posting..." : "Posting"}
                   </button>
                 </div>
               </div>
@@ -112,11 +143,23 @@ export default function Home() {
           </div>
         </div>
         
-        <div>
-          {mockThreads.map(thread => (
-            <Thread key={thread.id} {...thread} />
-          ))}
-        </div>
+        {threadsLoading ? (
+          <div className="p-6 text-center text-gray-500">Loading threads...</div>
+        ) : threadsError ? (
+          <div className="p-6 text-center text-red-500">Error loading threads. Please try again.</div>
+        ) : threads.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">No threads yet. Be the first to post!</div>
+        ) : (
+          <div>
+            {threads.map(thread => (
+              <Thread 
+                key={thread.id} 
+                {...threadFeedToProps(thread)} 
+                onLike={handleLike} 
+              />
+            ))}
+          </div>
+        )}
       </div>
     </MainLayout>
   );

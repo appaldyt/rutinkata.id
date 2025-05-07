@@ -3,7 +3,9 @@ const nextConfig = {
   images: {
     domains: [
       'i.pravatar.cc',
-      'images.unsplash.com'
+      'images.unsplash.com',
+      'api.dicebear.com',
+      'qvazzlygtfhsbrkcofbu.supabase.co'
     ],
   },
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/hooks';
+import { useRouter } from 'next/navigation';
 
 type AuthFormProps = {
   mode: 'signin' | 'signup';
@@ -11,42 +12,45 @@ export default function AuthForm({ mode, onSuccess }: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { signIn, signUp, loading } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              username,
-              name,
-            },
-          },
-        });
+        if (!username) {
+          setError('Username is required');
+          return;
+        }
+
+        // Username validation - only allow letters, numbers, and underscores
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+          setError('Username can only contain letters, numbers, and underscores');
+          return;
+        }
+
+        const { data, error } = await signUp(email, password, username);
 
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await signIn(email, password);
 
         if (error) throw error;
       }
 
-      if (onSuccess) onSuccess();
+      // Success handling
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // Redirect to home page if no success callback provided
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred during authentication');
-    } finally {
-      setLoading(false);
     }
   };
 
