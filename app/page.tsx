@@ -1,5 +1,9 @@
+"use client";
+
 import MainLayout from "../components/MainLayout";
 import Thread from "../components/Thread";
+import Image from "next/image";
+import { useState } from "react";
 
 // Mock data for threads (in a real app, this would come from Supabase)
 const mockThreads = [
@@ -51,6 +55,20 @@ const mockThreads = [
 ];
 
 export default function Home() {
+  const [postText, setPostText] = useState("");
+  
+  // Current user (would come from auth in a real app)
+  const currentUser = {
+    name: "aldyt_hya",
+    avatarUrl: "https://i.pravatar.cc/150?img=3"
+  };
+  
+  const handlePost = () => {
+    // In a real app, this would send the post to the backend
+    console.log("Posting:", postText);
+    setPostText("");
+  };
+  
   return (
     <MainLayout>
       <div className="mb-6">
@@ -59,7 +77,42 @@ export default function Home() {
       
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 border-b border-gray-200">
-          <h2 className="font-semibold">For You</h2>
+          <h2 className="font-semibold">Untuk Anda</h2>
+        </div>
+        
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <Image 
+                src={currentUser.avatarUrl} 
+                alt={currentUser.name}
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+            </div>
+            <div className="flex-1">
+              <div className="font-medium mb-1">{currentUser.name}</div>
+              <div className="relative">
+                <textarea 
+                  className="w-full border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  placeholder="Apa yang baru?"
+                  rows={3}
+                  value={postText}
+                  onChange={(e) => setPostText(e.target.value)}
+                ></textarea>
+                <div className="mt-2 flex justify-end">
+                  <button 
+                    className="px-4 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!postText.trim()}
+                    onClick={handlePost}
+                  >
+                    Posting
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div>
