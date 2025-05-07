@@ -1,14 +1,34 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Navigation() {
   const pathname = usePathname();
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 md:top-0 md:border-t-0 md:border-r md:h-screen md:w-64">
+    <>
+      {/* Login Button (Top Right) */}
+      <div className="fixed top-4 right-4 z-50">
+        <Link href="/auth" className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-full shadow transition-all duration-200 flex items-center justify-center">
+          Login
+        </Link>
+      </div>
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 md:top-0 md:border-t-0 md:border-r md:h-screen md:w-64">
       <div className="container mx-auto flex justify-around md:flex-col md:h-full md:justify-start md:space-y-8 md:pt-10">
+        <div className="hidden md:flex justify-center items-center mb-4 mt-2">
+          <div className="transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-gray-400/50 rounded-md p-2">
+            <Image 
+              src="/rutinkata.png" 
+              alt="RutinKata Logo" 
+              width={120} 
+              height={40} 
+              priority
+              className="object-contain"
+            />
+          </div>
+        </div>
         <Link 
           href="/" 
           className={`flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 ${pathname === '/' ? 'font-bold' : 'text-gray-600'}`}
@@ -56,5 +76,6 @@ export default function Navigation() {
         </Link>
       </div>
     </nav>
+    </>
   );
 }
